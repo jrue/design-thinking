@@ -88,7 +88,7 @@
               <span class="badge badge-pill badge-info">Empathy</span>
             </div>
             <ol>
-              <li>Separate out into two groups and define who is in <strong>Group A</strong> and <strong>Group B</strong> (try to be even).</li>
+              <li>Separate into two groups and define who is in <strong>Group A</strong> and <strong>Group B</strong> (try to be even).</li>
               <li><strong>Group A</strong> will interview <strong>Group B</strong> for exactly 6 minutes.<br><br>
                 <div class="text-center">
                   <div class="timer-holder alert alert-secondary d-inline-block p-4">
@@ -97,15 +97,16 @@
                   </div>
                 </div>
               </li>
-              <li>Group A takes notes about the responses in one half of their paper. Make sure everyone participates and has a chance to weigh in. The question being asked is,<br><strong>“Describe your most recent new consumption experience.”</strong> Meaning, what was the last time you got the news.
+              <li>Group A takes notes from the interview in one side of their paper. Make sure everyone participates and has a chance to weigh in during the interview. The question being asked is,<br><strong>“Describe your most recent news consumption experience.”</strong> Meaning, what was the last time you consumed the news.
                 <ul>
                   <li>How did you consume it?</li>
                   <li>What method/app/device did you use?</li>
                   <li>Where were you?</li>
                   <li>Did it cost money?</li>
+                  <li>Etc.</li>
                 </ul>
               </li>
-              <li>When the timer goes off, immediately stop. When everyone is ready, proceed to the next step.</li>
+              <li>When the timer ends, immediately stop. When everyone is ready, proceed to the next step.</li>
             </ol>
             <button type="button" class="btn btn-primary mx-auto d-block mb-3 next">Timer is done, ready for next step.</button>
           </div>
@@ -124,7 +125,7 @@
             <ol>
               <li>Now <strong>Group B</strong> will interview <strong>Group A</strong> for six minutes. Same question.
                 <ul>
-                  <li><strong>“Describe your most recent new consumption experience.”</strong></li>
+                  <li><strong>“Describe your most recent news consumption experience.”</strong></li>
                   <li>How did you consume it?</li>
                   <li>What method/app/device did you use?</li>
                   <li>Where were you?</li>
@@ -332,6 +333,7 @@
     <script type="text/javascript" src="js/countdowntimer.js"></script>
     <script>
     jQuery(document).ready(function($){
+
       
       //$('section:not(:first-child)').removeClass('d-block').addClass('d-none');
       
@@ -343,18 +345,35 @@
       $('.last').on('click', function(evt){
         $(this).parents("section").removeClass("d-block").addClass("d-none");
         $('section').eq(0).removeClass('d-none').addClass('d-block');
-      })
+      });
 
       $(".timer").each(function(index,elm){
         $(elm).on("click", function(evt){
           evt.preventDefault();
 
+          
+          
+
           if(!this.hasOwnProperty('timer')){
             this.timer = new CountDownTimer();
+
+            this.timer.alarm = new Audio("assets/alarm.mp3");
+            this.timer.alarm.addEventListener("canplay", function(){
+              this.pause();
+            });
+
             this.timer.onTick(function(minutes,seconds){
               minutes = minutes < 10 ? "0" + minutes : minutes;
               seconds = seconds < 10 ? "0" + seconds : seconds;
               this.display.text(minutes + ":" + seconds);
+    
+
+              if(this.expired()){
+                this.alarm.play();
+              }
+              if(this.paused){
+                this.alarm.stop();
+              }
             });
           
             if($(this).text() === "Start"){
@@ -376,10 +395,9 @@
           } else {
           
             if($(this).text("Reset")) {
-              this.timer.pause();
               this.timer.display.text(this.timer.display.data('timer-original'));
               $(this).text("Start");
-              this.timer = null;
+              this.timer.alarm.pause();
               delete this.timer;
           }
         }
